@@ -53,6 +53,7 @@ class ZaakFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = Zaak
+        django_get_or_create = ('zaakidentificatie',)
 
     @factory.post_generation
     def status_set(obj, create, extracted, **kwargs):

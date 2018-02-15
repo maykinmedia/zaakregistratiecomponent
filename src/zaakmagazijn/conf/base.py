@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'compat',  # Part of hijack
     'hijack_admin',
     'auditlog',
+    'rest_framework',
 
     # Project applications.
     'zaakmagazijn.accounts',

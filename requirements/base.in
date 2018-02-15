@@ -16,7 +16,7 @@ django-sniplates
 django-redis
 unidecode
 
-# djangorestframework
+djangorestframework
 
 # forks
 -e git+https://github.com/maykinmedia/spyne.git@maykin#egg=spyne

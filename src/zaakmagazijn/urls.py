@@ -30,5 +30,6 @@ if settings.DEBUG and 'debug_toolbar' in settings.INSTALLED_APPS:
     ]
 
 urlpatterns += [
+    url(r'^api/', include('zaakmagazijn.api.rest.urls', namespace='rest_api')),
     url(r'^', include('zaakmagazijn.api.urls')),
 ]
