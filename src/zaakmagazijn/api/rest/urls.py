@@ -4,28 +4,39 @@ from rest_framework_extensions.routers import (
     ExtendedDefaultRouter as DefaultRouter
 )
 
-from .views import NatuurlijkPersoonViewSet, RolViewSet, ZaakViewSet
+from .views import (
+    NatuurlijkPersoonViewSet, RolViewSet, StatusTypeViewSet, StatusViewSet,
+    ZaakTypeViewSet, ZaakViewSet
+)
 
 nested_router = DefaultRouter()
-nested_router.register(
+zaken_routes = nested_router.register(
     r'zaken',
     ZaakViewSet,
     base_name='zaken',
-).register(
+)
+zaken_routes.register(
     r'betrokkenen',
     NatuurlijkPersoonViewSet,
     base_name='zaken_betrokkenen',
     parents_query_lookups=['zaken']
 )
+zaken_routes.register(
+    r'zaaktype',
+    ZaakTypeViewSet,
+    base_name='zaken_zaaktype',
+    parents_query_lookups=['zaak']
+)
+zaken_routes.register(
+    r'status',
+    StatusViewSet,
+    base_name='zaken_status',
+    parents_query_lookups=['zaak']
+)
 nested_router.register(r'rollen', RolViewSet, base_name='rollen')
+nested_router.register(r'statustypen', StatusTypeViewSet, base_name='statustypen')
 
-# router = DefaultRouter()
-# Wire up our API using automatic URL routing.
-# Additionally, we include login URLs for the browsable API.
 urlpatterns = [
-    # url(r'^', include(router.urls)),
     url(r'^', include(nested_router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]
-
-# urlpatterns += nested_router.urls

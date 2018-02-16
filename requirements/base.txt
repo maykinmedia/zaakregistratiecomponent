@@ -24,6 +24,7 @@ django-rosetta==0.7.13
 django-sniplates==0.5.0
 django==1.11.7
 djangorestframework==3.7.7
+drf-extensions==0.3.1
 first==2.0.1              # via pip-tools
 httplib2==0.8
 iso8601==0.1.11

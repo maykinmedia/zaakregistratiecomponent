@@ -17,6 +17,7 @@ django-redis
 unidecode
 
 djangorestframework
+drf-extensions
 
 # forks
 -e git+https://github.com/maykinmedia/spyne.git@maykin#egg=spyne
