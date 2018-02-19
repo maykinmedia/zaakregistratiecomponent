@@ -53,6 +53,9 @@ class Organisation(models.Model):
     def __str__(self):
         return self.name
 
+    def is_authenticated(self):
+        return True # There is no user validation yet. So the organisation will be used for now.
+
 
 class Application(models.Model):
     name = models.CharField(_('naam'), max_length=50, unique=True)

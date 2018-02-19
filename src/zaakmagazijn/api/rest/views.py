@@ -2,12 +2,12 @@ from rest_framework import viewsets
 from rest_framework_extensions.mixins import NestedViewSetMixin
 
 from zaakmagazijn.rgbz.models import (
-    NatuurlijkPersoon, Rol, Status, StatusType, Zaak, ZaakType
+    Klantcontact, NatuurlijkPersoon, Rol, Status, StatusType, Zaak, ZaakType
 )
 
 from .serializers import (
-    NatuurlijkPersoonSerializer, RolSerializer, StatusSerializer,
-    StatusTypeSerializer, ZaakSerializer, ZaakTypeSerializer
+    KlantcontactSerializer, NatuurlijkPersoonSerializer, RolSerializer,
+    StatusSerializer, StatusTypeSerializer, ZaakSerializer, ZaakTypeSerializer
 )
 
 
@@ -21,7 +21,7 @@ class NestedWithRequestMixin(object):
 
 class ZaakViewSet(NestedWithRequestMixin, NestedViewSetMixin, viewsets.ReadOnlyModelViewSet):
     """
-    API endpoint that allows 'zaken' to be viewed or edited.
+    API endpoint that allows 'zaken' to be viewed.
     """
     queryset = Zaak.objects.all()
     serializer_class = ZaakSerializer
@@ -29,22 +29,23 @@ class ZaakViewSet(NestedWithRequestMixin, NestedViewSetMixin, viewsets.ReadOnlyM
 
 class RolViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    API endpoint that allows 'rollen' to be viewed or edited.
+    API endpoint that allows 'rollen' to be viewed.
     """
     queryset = Rol.objects.all()
     serializer_class = RolSerializer
 
 
 class StatusTypeViewSet(viewsets.ReadOnlyModelViewSet):
-    '''
-    '''
+    """
+    API endpoint that allows 'statustypes' to be viewed.
+    """
     queryset = StatusType.objects.all()
     serializer_class = StatusTypeSerializer
 
 
 class NatuurlijkPersoonViewSet(NestedWithRequestMixin, NestedViewSetMixin, viewsets.ReadOnlyModelViewSet):
     """
-    API endpoint that allows 'natuurlijkpersonen' to be viewed or edited.
+    API endpoint that allows 'natuurlijkpersonen' to be viewed.
     """
     queryset = NatuurlijkPersoon.objects.all().distinct()
     serializer_class = NatuurlijkPersoonSerializer
@@ -52,7 +53,7 @@ class NatuurlijkPersoonViewSet(NestedWithRequestMixin, NestedViewSetMixin, views
 
 class ZaakTypeViewSet(NestedWithRequestMixin, NestedViewSetMixin, viewsets.ReadOnlyModelViewSet):
     """
-    API endpoint that allows 'zaaktypes' to be viewed or edited.
+    API endpoint that allows 'zaaktypes' to be viewed.
     """
     queryset = ZaakType.objects.all()
     serializer_class = ZaakTypeSerializer
@@ -60,7 +61,15 @@ class ZaakTypeViewSet(NestedWithRequestMixin, NestedViewSetMixin, viewsets.ReadO
 
 class StatusViewSet(NestedWithRequestMixin, NestedViewSetMixin, viewsets.ReadOnlyModelViewSet):
     """
-    API endpoint that allows 'zaaktypes' to be viewed or edited.
+    API endpoint that allows 'zaaktypes' to be viewed.
     """
     queryset = Status.objects.all()
     serializer_class = StatusSerializer
+
+
+class KlantcontactViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows 'klantcontact' to be viewed or edited.
+    """
+    queryset = Klantcontact.objects.all()
+    serializer_class = KlantcontactSerializer

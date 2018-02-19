@@ -404,3 +404,13 @@ CMIS_CLIENT_USER_PASSWORD = 'admin'
 
 # Use a property to store the sender information
 CMIS_SENDER_PROPERTY = None
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'zaakmagazijn.apiauth.authentication.HeaderAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+}
