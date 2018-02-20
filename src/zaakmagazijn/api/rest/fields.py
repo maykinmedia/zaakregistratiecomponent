@@ -21,9 +21,6 @@ class NestedHyperlinkedRelatedField(WithInstanceMixin, HyperlinkedRelatedField):
         super().__init__(view_name, **kwargs)
 
     def get_url(self, obj, view_name, request, format):
-        if obj.pk is None:
-            return None
-
         kwargs = {}
         for k, v in self.lookup_kwargs.items():
             args = v.split('.')
@@ -42,9 +39,6 @@ class NestedRequestHyperlinkedRelatedField(WithInstanceMixin, HyperlinkedIdentit
         super().__init__(view_name, **kwargs)
 
     def get_url(self, obj, view_name, request, format):
-        if obj.pk is None:
-            return None
-
         kwargs = {}
         for key, value in self.lookup_kwargs.items():
             if request.kwargs and request.kwargs.get(value):
@@ -56,9 +50,6 @@ class NestedRequestHyperlinkedRelatedField(WithInstanceMixin, HyperlinkedIdentit
 
 class ParentHyperlinkedRelatedField(HyperlinkedIdentityField):
     def get_url(self, obj, view_name, request, format):
-        if obj.pk is None:
-            return None
-
         kwargs = {}
         if request.kwargs and request.kwargs.get(self.lookup_field):
             kwargs[self.lookup_url_kwarg] = request.kwargs.get(self.lookup_field)

@@ -7,7 +7,8 @@ from rest_framework.reverse import reverse
 from rest_framework_extensions.fields import ResourceUriField
 
 from zaakmagazijn.rgbz.models import (
-    Klantcontact, NatuurlijkPersoon, Rol, Status, StatusType, Zaak, ZaakType
+    InformatieObject, Klantcontact, Medewerker, NatuurlijkPersoon, Rol, Status,
+    StatusType, Zaak, ZaakType
 )
 
 from .fields import (
@@ -30,11 +31,6 @@ class HyperlinkedModelSerializer(serializers.HyperlinkedModelSerializer):
             except SkipField:
                 continue
 
-            # We skip `to_representation` for `None` values so that fields do
-            # not have to explicitly deal with that case.
-            #
-            # For related fields with `use_pk_only_optimization` we need to
-            # resolve the pk value.
             check_for_none = attribute.pk if isinstance(attribute, PKOnlyObject) else attribute
             if check_for_none is None:
                 ret[field.field_name] = None
@@ -61,6 +57,7 @@ class RolSerializer(HyperlinkedModelSerializer):
     class Meta:
         model = Rol
         fields = (
+            'url',
             'rolomschrijving',
             'rolomschrijving_generiek',
             'roltoelichting',
@@ -68,6 +65,9 @@ class RolSerializer(HyperlinkedModelSerializer):
             'zaak',
             'betrokkene',
         )
+        extra_kwargs = {
+            'url': {'view_name': 'rest_api:rollen-detail'},
+        }
 
 
 class StatusTypeSerializer(serializers.HyperlinkedModelSerializer):
@@ -80,6 +80,7 @@ class StatusTypeSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = StatusType
         fields = (
+            'url',
             'statustypevolgnummer',
             'statustypeomschrijving',
             'statustypeomschrijving_generiek',
@@ -92,6 +93,9 @@ class StatusTypeSerializer(serializers.HyperlinkedModelSerializer):
             # 'informeren',
             # 'statustekst',
         )
+        extra_kwargs = {
+            'url': {'view_name': 'rest_api:statustypen-detail'}
+        }
 
 
 class ZaakSerializer(serializers.HyperlinkedModelSerializer):
@@ -171,7 +175,7 @@ class ZaakSerializer(serializers.HyperlinkedModelSerializer):
             'rol_set',
         )
         extra_kwargs = {
-            'url': {'view_name': 'rest_api:zaken-detail', 'lookup_field': 'pk'},
+            'url': {'view_name': 'rest_api:zaken-detail'},
         }
 
     def get_heeft(self, obj):
@@ -305,6 +309,10 @@ class KlantcontactSerializer(HyperlinkedModelSerializer):
         view_name='rest_api:zaken-detail',
         queryset=Zaak.objects.all(),
     )
+    medewerker = serializers.HyperlinkedRelatedField(
+        view_name='rest_api:medewerker-detail',
+        queryset=Medewerker.objects.all(),
+    )
     natuurlijk_persoon = NestedHyperlinkedRelatedField(
         view_name='rest_api:zaken_betrokkenen-detail',
         lookup_kwargs={
@@ -325,8 +333,85 @@ class KlantcontactSerializer(HyperlinkedModelSerializer):
             'zaak',
             'natuurlijk_persoon',
             # 'vestiging', # Heeft nog geen viewset kan niet linken
-            # 'medewerker', # Heeft nog geen viewset kan niet linken
+            'medewerker',
         )
         extra_kwargs = {
-            'url': {'view_name': 'rest_api:klantcontact-detail', 'lookup_field': 'pk'},
+            'url': {'view_name': 'rest_api:klantcontact-detail'},
+        }
+
+
+class MedewerkerSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Medewerker
+        fields = (
+            'url',
+            'medewerkeridentificatie',
+            # 'organisatie',
+            'achternaam',
+            'emailadres',
+            'voorletters',
+            'voorvoegsel_achternaam',
+            'geslachtsaanduiding',
+            'datum_uit_dienst',
+            'medewerkertoelichting',
+            'functie',
+            'roepnaam',
+            'telefoonnummer',
+            # 'StUF:tijdvakGeldigheid',
+            # 'StUF:tijdstipRegistratie',
+            # 'StUF:extraElementen',
+            # 'StUF:aanvullendeElementen',
+            # 'historieMaterieel',
+            # 'historieFormeel',
+            # 'hoortBij',
+            # 'isContactpersoonVoor',
+            # 'isVerantwoordelijkVoor',
+        )
+        extra_kwargs = {
+            'url': {'view_name': 'rest_api:medewerker-detail'},
+        }
+
+
+class InformatieObjectSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = InformatieObject
+        fields = (
+            'url',
+            'informatieobjectidentificatie',
+            'bronorganisatie',
+            'creatiedatum',
+            'ontvangstdatum',
+            'afzender',
+            # 'typering',
+            'titel',
+            'beschrijving',
+            'versie',
+            'informatieobject_status',
+            'verzenddatum',
+            'geadresseerde',
+            'vertrouwlijkaanduiding',
+            'archiefnominatie',
+            'archiefactiedatum',
+            'auteur',
+            'verschijningsvorm',
+            # 'eib.formaat',
+            # 'eib.taal',
+            # 'eib.inhoud',
+            # 'eib.link',
+            # 'eib.bestandsomvang',
+            # 'bestandsnaamEnkelvoudigInformatieobject',
+            # 'gebruiksrechtenInformatieobject',
+            # 'informatieobjecttype',
+            # 'integriteitEnkelvoudigInformatieobject',
+            # 'ondertekeningInformatieobject',
+            # 'historieMaterieel',
+            # 'historieFormeel',
+            # 'isBekendBij',
+            # 'isOnderdeelVan',
+            # 'isOntvangenVanOfVerzondenAan',
+            # 'kanVastleggingZijnVan',
+            # 'omvat',
+        )
+        extra_kwargs = {
+            'url': {'view_name': 'rest_api:informatieobject-detail'},
         }

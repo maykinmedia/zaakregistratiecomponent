@@ -51,3 +51,6 @@ class DMSField:
 
     def has_default(self):
         return False
+
+    def serialize(self):
+        return None

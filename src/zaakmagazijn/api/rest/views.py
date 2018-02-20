@@ -2,12 +2,14 @@ from rest_framework import viewsets
 from rest_framework_extensions.mixins import NestedViewSetMixin
 
 from zaakmagazijn.rgbz.models import (
-    Klantcontact, NatuurlijkPersoon, Rol, Status, StatusType, Zaak, ZaakType
+    InformatieObject, Klantcontact, Medewerker, NatuurlijkPersoon, Rol, Status,
+    StatusType, Zaak, ZaakType
 )
 
 from .serializers import (
-    KlantcontactSerializer, NatuurlijkPersoonSerializer, RolSerializer,
-    StatusSerializer, StatusTypeSerializer, ZaakSerializer, ZaakTypeSerializer
+    InformatieObjectSerializer, KlantcontactSerializer, MedewerkerSerializer,
+    NatuurlijkPersoonSerializer, RolSerializer, StatusSerializer,
+    StatusTypeSerializer, ZaakSerializer, ZaakTypeSerializer
 )
 
 
@@ -73,3 +75,19 @@ class KlantcontactViewSet(viewsets.ModelViewSet):
     """
     queryset = Klantcontact.objects.all()
     serializer_class = KlantcontactSerializer
+
+
+class MedewerkerViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    API endpoint that allows 'medewerker' to be viewed.
+    """
+    queryset = Medewerker.objects.all()
+    serializer_class = MedewerkerSerializer
+
+
+class InformatieObjectViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    API endpoint that allows 'informatieobject' to be viewed.
+    """
+    queryset = InformatieObject.objects.all()
+    serializer_class = InformatieObjectSerializer

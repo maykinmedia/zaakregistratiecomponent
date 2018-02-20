@@ -27,3 +27,4 @@ local.py
 /mail/
 /log/*.log*
 .vagrant
+coverage.xml

@@ -9,7 +9,6 @@ from .models import Organisation
 class HeaderAuthentication(authentication.BaseAuthentication):
     def authenticate(self, request):
         organization_name = request.META.get('HTTP_X_NLX_ORGANISATION_CN')
-        print(organization_name)
         if not organization_name:
             return None
 

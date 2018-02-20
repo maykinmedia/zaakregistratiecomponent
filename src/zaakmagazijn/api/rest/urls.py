@@ -5,8 +5,9 @@ from rest_framework_extensions.routers import (
 )
 
 from .views import (
-    KlantcontactViewSet, NatuurlijkPersoonViewSet, RolViewSet,
-    StatusTypeViewSet, StatusViewSet, ZaakTypeViewSet, ZaakViewSet
+    InformatieObjectViewSet, KlantcontactViewSet, MedewerkerViewSet,
+    NatuurlijkPersoonViewSet, RolViewSet, StatusTypeViewSet, StatusViewSet,
+    ZaakTypeViewSet, ZaakViewSet
 )
 
 nested_router = DefaultRouter()
@@ -36,6 +37,8 @@ zaken_routes.register(
 nested_router.register(r'rollen', RolViewSet, base_name='rollen')
 nested_router.register(r'statustypen', StatusTypeViewSet, base_name='statustypen')
 nested_router.register(r'klantcontact', KlantcontactViewSet, base_name='klantcontact')
+nested_router.register(r'medewerker', MedewerkerViewSet, base_name='medewerker')
+nested_router.register(r'informatieobject', InformatieObjectViewSet, base_name='informatieobject')
 
 urlpatterns = [
     url(r'^', include(nested_router.urls)),
