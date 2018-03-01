@@ -39,6 +39,7 @@ def handle_authorization(ctx):
                             key, request_value, system_val
                         ))
 
+        # Set information to be picked up by the `zaakmagazijn.auditlog_extension.signals.set_soap_data`.
         from auditlog.middleware import threadlocal
         if hasattr(threadlocal, 'auditlog'):
             threadlocal.auditlog['data'] = {

@@ -1,16 +1,14 @@
-from django.db.models import signals
 from django.test import TestCase
 from django.urls import reverse
 
-import factory
 from rest_framework.test import APIClient
 
-from zaakmagazijn.apiauth.tests.factory_models import OrganisationFactory
-from zaakmagazijn.rgbz.models import (
+from ....apiauth.tests.factory_models import OrganisationFactory
+from ....rgbz.models import (
     InformatieObject, Klantcontact, Medewerker, NatuurlijkPersoon, Rol, Status,
     StatusType, Zaak, ZaakType
 )
-from zaakmagazijn.rgbz.tests.factory_models import (
+from ....rgbz.tests.factory_models import (
     InformatieObjectFactory, KlantcontactFactory, MedewerkerFactory,
     NatuurlijkPersoonFactory, RolFactory, StatusFactory, StatusTypeFactory,
     ZaakFactory, ZaakTypeFactory
@@ -18,8 +16,9 @@ from zaakmagazijn.rgbz.tests.factory_models import (
 
 
 class CreateDataMixin(object):
-    @factory.django.mute_signals(signals.pre_save, signals.post_save)
     def setUp(self):
+        super().setUp()
+
         self.zaak_type = ZaakTypeFactory()
         self.zaak = ZaakFactory(zaaktype=self.zaak_type)
         self.natuurlijk_persoon = NatuurlijkPersoonFactory()
@@ -227,7 +226,6 @@ class TestKlantcontactViewSet(CreateDataMixin, TestCase):
             'medewerker': ['Dit veld is vereist.']
         })
 
-    @factory.django.mute_signals(signals.pre_save, signals.post_save)
     def test_post_required_fields(self):
         self._authenticate()
 
@@ -259,7 +257,6 @@ class TestKlantcontactViewSet(CreateDataMixin, TestCase):
             'medewerker': 'http://testserver{}'.format(medewerker_url)
         })
 
-    @factory.django.mute_signals(signals.pre_save, signals.post_save)
     def test_post_all_fields(self):
         self._authenticate()
 
@@ -293,13 +290,11 @@ class TestKlantcontactViewSet(CreateDataMixin, TestCase):
             'medewerker': 'http://testserver{}'.format(medewerker_url)
         })
 
-    @factory.django.mute_signals(signals.pre_save, signals.post_save)
     def test_delete_klantcontact(self):
         self._authenticate()
         response = self.client.delete(self.detail_url)
         self.assertEqual(response.status_code, 204, msg=response.data)
 
-    @factory.django.mute_signals(signals.pre_save, signals.post_save)
     def test_delete_klantcontact_twice(self):
         self._authenticate()
         response = self.client.delete(self.detail_url)
@@ -321,7 +316,6 @@ class TestKlantcontactViewSet(CreateDataMixin, TestCase):
             'medewerker': ['Dit veld is vereist.']
         })
 
-    @factory.django.mute_signals(signals.pre_save, signals.post_save)
     def test_put_required_fields(self):
         self._authenticate()
 

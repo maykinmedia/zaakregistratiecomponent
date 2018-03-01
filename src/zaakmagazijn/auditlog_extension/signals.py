@@ -13,6 +13,8 @@ def set_soap_data(sender, instance, **kwargs):
     """
     Signal receiver with an extra, required 'user' kwarg. This method becomes a real (valid) signal receiver when
     it is curried with the actor.
+
+    Processes information set by `zaakmagazijn.apiauth.utils.handle_authorization`.
     """
     from auditlog.middleware import threadlocal
     if not hasattr(threadlocal, 'auditlog'):
@@ -20,5 +22,7 @@ def set_soap_data(sender, instance, **kwargs):
 
     try:
         instance.additional_data = threadlocal.auditlog['data']
+    except KeyError as e:
+        pass
     except Exception as e:
         logger.exception(e)
