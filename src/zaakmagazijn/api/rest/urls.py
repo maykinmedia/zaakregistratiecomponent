@@ -10,6 +10,8 @@ from .views import (
     ZaakTypeViewSet, ZaakViewSet
 )
 
+from .schema import schema_view
+
 nested_router = DefaultRouter()
 zaken_routes = nested_router.register(
     r'zaken',
@@ -40,7 +42,14 @@ nested_router.register(r'klantcontact', KlantcontactViewSet, base_name='klantcon
 nested_router.register(r'medewerker', MedewerkerViewSet, base_name='medewerker')
 nested_router.register(r'informatieobject', InformatieObjectViewSet, base_name='informatieobject')
 
+
+API_PREFIX = r'^v(?P<version>\d+)'
+
+
 urlpatterns = [
+    url(r'{}/schema(?P<format>.json|.yaml)$'.format(API_PREFIX), schema_view.without_ui(cache_timeout=None), name='api-schema-json'),
+    url(r'{}/schema/$'.format(API_PREFIX), schema_view.with_ui('redoc', cache_timeout=None), name='api-schema'),
+
     url(r'^', include(nested_router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]
