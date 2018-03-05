@@ -1,8 +1,5 @@
 from django.conf.urls import include, url
-
-from rest_framework_extensions.routers import (
-    ExtendedDefaultRouter as DefaultRouter
-)
+from rest_framework_nested import routers
 
 from .views import (
     InformatieObjectViewSet, KlantcontactViewSet, MedewerkerViewSet,
@@ -12,35 +9,18 @@ from .views import (
 
 from .schema import schema_view
 
-nested_router = DefaultRouter()
-zaken_routes = nested_router.register(
-    r'zaken',
-    ZaakViewSet,
-    base_name='zaken',
-)
-zaken_routes.register(
-    r'betrokkenen',
-    NatuurlijkPersoonViewSet,
-    base_name='zaken_betrokkenen',
-    parents_query_lookups=['zaken']
-)
-zaken_routes.register(
-    r'zaaktype',
-    ZaakTypeViewSet,
-    base_name='zaken_zaaktype',
-    parents_query_lookups=['zaak']
-)
-zaken_routes.register(
-    r'status',
-    StatusViewSet,
-    base_name='zaken_status',
-    parents_query_lookups=['zaak']
-)
-nested_router.register(r'rollen', RolViewSet, base_name='rollen')
-nested_router.register(r'statustypen', StatusTypeViewSet, base_name='statustypen')
-nested_router.register(r'klantcontact', KlantcontactViewSet, base_name='klantcontact')
-nested_router.register(r'medewerker', MedewerkerViewSet, base_name='medewerker')
-nested_router.register(r'informatieobject', InformatieObjectViewSet, base_name='informatieobject')
+root_router = routers.DefaultRouter()
+root_router.register(r'rollen', RolViewSet, base_name='rollen')
+root_router.register(r'statustypen', StatusTypeViewSet, base_name='statustypen')
+root_router.register(r'klantcontacten', KlantcontactViewSet, base_name='klantcontacten')
+root_router.register(r'medewerkers', MedewerkerViewSet, base_name='medewerkers')
+root_router.register(r'informatieobjecten', InformatieObjectViewSet, base_name='informatieobjecten')
+root_router.register(r'zaaktypen', ZaakTypeViewSet, base_name='zaaktypen')  # parents_query_lookups=['zaak']
+root_router.register(r'zaken', ZaakViewSet, base_name='zaken')
+root_router.register(r'natuurlijke-personen', NatuurlijkPersoonViewSet, base_name='natuurlijke-personen')  # parents_query_lookups=['zaken']
+
+zaken_router = routers.NestedSimpleRouter(root_router, r'zaken', lookup='zaken')
+zaken_router.register(r'statussen', StatusViewSet, base_name='zaken_statussen') #  parents_query_lookups=['zaak']
 
 
 API_PREFIX = r'^v(?P<version>\d+)'
@@ -50,6 +30,7 @@ urlpatterns = [
     url(r'{}/schema(?P<format>.json|.yaml)$'.format(API_PREFIX), schema_view.without_ui(cache_timeout=None), name='api-schema-json'),
     url(r'{}/schema/$'.format(API_PREFIX), schema_view.with_ui('redoc', cache_timeout=None), name='api-schema'),
 
-    url(r'^', include(nested_router.urls)),
-    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+    url('{}/'.format(API_PREFIX), include(root_router.urls)),
+    url('{}/'.format(API_PREFIX), include(zaken_router.urls)),
+    # url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]

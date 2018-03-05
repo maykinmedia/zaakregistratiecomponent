@@ -437,7 +437,7 @@ REST_FRAMEWORK = {
     'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.URLPathVersioning',
     #
     # # Generic view behavior
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'DEFAULT_FILTER_BACKENDS': (
         # 'django_filters.rest_framework.DjangoFilterBackend',
         'rest_framework.filters.SearchFilter',
@@ -476,7 +476,7 @@ REST_FRAMEWORK = {
     #
     # # Exception handling
     'EXCEPTION_HANDLER': 'rest_framework.views.exception_handler',
-    # 'EXCEPTION_HANDLER': 'ztc.api.utils.exceptions.exception_handler',
+    # 'EXCEPTION_HANDLER': 'zaakmagazijn.api.rest.utils.exceptions.exception_handler',
     # 'NON_FIELD_ERRORS_KEY': 'non_field_errors',
     #
     # # Testing

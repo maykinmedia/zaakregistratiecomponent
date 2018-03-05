@@ -1,57 +1,18 @@
-from collections import OrderedDict
-
 from rest_framework import serializers
-from rest_framework.fields import SkipField
-from rest_framework.relations import PKOnlyObject
 from rest_framework.reverse import reverse
-from rest_framework_extensions.fields import ResourceUriField
+from rest_framework_nested.relations import NestedHyperlinkedRelatedField
+from rest_framework_nested.serializers import NestedHyperlinkedModelSerializer
 
-from zaakmagazijn.rgbz.models import (
+from ...rgbz.models import (
     InformatieObject, Klantcontact, Medewerker, NatuurlijkPersoon, Rol, Status,
-    StatusType, Zaak, ZaakType
-)
+    StatusType, Zaak, ZaakType,
+    Betrokkene)
 
-from .fields import (
-    NestedHyperlinkedRelatedField, NestedRequestHyperlinkedRelatedField,
-    ParentHyperlinkedRelatedField
-)
-
-
-class HyperlinkedModelSerializer(serializers.HyperlinkedModelSerializer):
-    def to_representation(self, instance):
-        """
-        Object instance -> Dict of primitive datatypes.
-        """
-        ret = OrderedDict()
-        fields = self._readable_fields
-
-        for field in fields:
-            try:
-                attribute = field.get_attribute(instance)
-            except SkipField:
-                continue
-
-            check_for_none = attribute.pk if isinstance(attribute, PKOnlyObject) else attribute
-            if check_for_none is None:
-                ret[field.field_name] = None
-            else:
-                try:
-                    ret[field.field_name] = field.to_representation(attribute, instance)
-                except TypeError:
-                    ret[field.field_name] = field.to_representation(attribute)
-
-        return ret
-
-
-class RolSerializer(HyperlinkedModelSerializer):
-    zaak = serializers.HyperlinkedRelatedField(
-        view_name='rest_api:zaken-detail',
-        queryset=Zaak.objects.all(),
-    )
-    betrokkene = NestedHyperlinkedRelatedField(
-        view_name='rest_api:zaken_betrokkenen-detail',
-        lookup_kwargs={"parent_lookup_zaken": "zaak_id"},
-        queryset=NatuurlijkPersoon.objects.all(),
+class RolSerializer(serializers.HyperlinkedModelSerializer):
+    betrokkene = serializers.HyperlinkedRelatedField(
+        read_only=True,
+        source='betrokkene.object_ptr',
+        view_name='rest_api:natuurlijke-personen-detail',
     )
 
     class Meta:
@@ -67,15 +28,16 @@ class RolSerializer(HyperlinkedModelSerializer):
         )
         extra_kwargs = {
             'url': {'view_name': 'rest_api:rollen-detail'},
+            'zaak': {'view_name': 'rest_api:zaken-detail'},
         }
 
 
 class StatusTypeSerializer(serializers.HyperlinkedModelSerializer):
-    zaaktypeidentificatie = serializers.IntegerField(source="zaaktype.zaaktypeidentificatie")
-    zaaktypeomschrijving = serializers.CharField(source="zaaktype.zaaktypeomschrijving")
-    zaaktypeomschrijving_generiek = serializers.CharField(source="zaaktype.zaaktypeomschrijving_generiek")
-    domein = serializers.CharField(source="zaaktype.domein")
-    rsin = serializers.CharField(source="zaaktype.rsin")
+    zaaktypeidentificatie = serializers.IntegerField(source='zaaktype.zaaktypeidentificatie', read_only=True)
+    zaaktypeomschrijving = serializers.CharField(source='zaaktype.zaaktypeomschrijving', read_only=True)
+    zaaktypeomschrijving_generiek = serializers.CharField(source='zaaktype.zaaktypeomschrijving_generiek', read_only=True)
+    domein = serializers.CharField(source='zaaktype.domein', read_only=True)
+    rsin = serializers.CharField(source='zaaktype.rsin', read_only=True)
 
     class Meta:
         model = StatusType
@@ -99,24 +61,22 @@ class StatusTypeSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class ZaakSerializer(serializers.HyperlinkedModelSerializer):
-    heeft_als_betrokkene = NestedHyperlinkedRelatedField(
-        view_name='rest_api:zaken_betrokkenen-detail',
-        lookup_kwargs={"parent_lookup_zaken": "zaak_id"},
+    heeft_als_betrokkene = serializers.HyperlinkedRelatedField(
         many=True,
-        queryset=NatuurlijkPersoon.objects.all(),
+        read_only=True,
         source='rol_set',
+        view_name='rest_api:natuurlijke-personen-detail',
     )
-    zaaktype = NestedHyperlinkedRelatedField(
-        view_name='rest_api:zaken_zaaktype-detail',
-        lookup_kwargs={"parent_lookup_zaak": "pk"},
-        queryset=ZaakType.objects.all(),
-    )
-    rol_set = serializers.HyperlinkedRelatedField(
-        view_name='rest_api:rollen-detail',
+
+    heeft = NestedHyperlinkedRelatedField(
         many=True,
-        queryset=Rol.objects.all(),
+        read_only=True,
+        source='status_set',
+        view_name='rest_api:zaken_statussen-detail',
+        parent_lookup_kwargs={
+            'zaken_pk': 'zaak__pk'
+        }
     )
-    heeft = serializers.SerializerMethodField()
 
     class Meta:
         model = Zaak
@@ -171,38 +131,22 @@ class ZaakSerializer(serializers.HyperlinkedModelSerializer):
             # # 'heeft_relevante_andere',
             # 'is_deelzaak_van',
             # # 'is_relevant_voor',
-            'kent',
+            'informatieobjecten',  # kent
             'rol_set',
         )
         extra_kwargs = {
             'url': {'view_name': 'rest_api:zaken-detail'},
+            'zaaktype': {'view_name': 'rest_api:zaaktypen-detail'},
+            'rol_set': {'view_name': 'rest_api:rollen-detail'},
+            'informatieobjecten': {'view_name': 'rest_api:informatieobjecten-detail'},
         }
-
-    def get_heeft(self, obj):
-        statuses = obj.status_set.all()
-
-        links = []
-        for status in statuses:
-            links.append(reverse('rest_api:zaken_status-detail', kwargs={'parent_lookup_zaak': obj.pk, 'pk': status.pk}, request=self.context.get('request')))
-        return links
 
 
 class NatuurlijkPersoonSerializer(serializers.HyperlinkedModelSerializer):
-    url = NestedRequestHyperlinkedRelatedField(
-        view_name='rest_api:zaken_betrokkenen-detail',
-        lookup_kwargs={"parent_lookup_zaken": "parent_lookup_zaken"},
-    )
-    parent = ParentHyperlinkedRelatedField(
-        view_name='rest_api:zaken-detail',
-        lookup_field='parent_lookup_zaken',
-        lookup_url_kwarg='pk',
-    )
-
     class Meta:
         model = NatuurlijkPersoon
         fields = (
             'url',
-            'parent',
             'burgerservicenummer',
             'nummer_ander_natuurlijk_persoon',
             'geslachtsaanduiding',
@@ -215,24 +159,16 @@ class NatuurlijkPersoonSerializer(serializers.HyperlinkedModelSerializer):
             # 'StUF:aanvullendeElementen',
             # 'historieMaterieel',
         )
+        extra_kwargs = {
+            'url': {'view_name': 'rest_api:natuurlijke-personen-detail'},
+        }
 
 
 class ZaakTypeSerializer(serializers.HyperlinkedModelSerializer):
-    url = NestedRequestHyperlinkedRelatedField(
-        view_name='rest_api:zaken_zaaktype-detail',
-        lookup_kwargs={"parent_lookup_zaak": "parent_lookup_zaak"},
-    )
-    parent = ParentHyperlinkedRelatedField(
-        view_name='rest_api:zaken-detail',
-        lookup_field='parent_lookup_zaak',
-        lookup_url_kwarg='pk',
-    )
-
     class Meta:
         model = ZaakType
         fields = (
             'url',
-            'parent',
             'zaaktypeidentificatie',
             'zaaktypeomschrijving',
             'zaaktypeomschrijving_generiek',
@@ -257,36 +193,19 @@ class ZaakTypeSerializer(serializers.HyperlinkedModelSerializer):
             # 'verantwoordingsrelatie',
             # 'versiedatum',
         )
+        extra_kwargs = {
+            'url': {'view_name': 'rest_api:zaaktypen-detail'},
+        }
 
-    def __init__(self, *args, **kwargs):
-        self.kwargs = kwargs.get('context').get('kwargs')
-        super().__init__(*args, **kwargs)
 
-
-class StatusSerializer(serializers.HyperlinkedModelSerializer):
-    url = NestedRequestHyperlinkedRelatedField(
-        view_name='rest_api:zaken_status-detail',
-        lookup_kwargs={"parent_lookup_zaak": "parent_lookup_zaak"},
-    )
-    parent = ParentHyperlinkedRelatedField(
-        view_name='rest_api:zaken-detail',
-        lookup_field='parent_lookup_zaak',
-        lookup_url_kwarg='pk',
-    )
-    rol = serializers.HyperlinkedRelatedField(
-        view_name='rest_api:rollen-detail',
-        queryset=Rol.objects.all(),
-    )
-    status_type = serializers.HyperlinkedRelatedField(
-        view_name='rest_api:statustypen-detail',
-        queryset=StatusType.objects.all(),
-    )
-
+class StatusSerializer(NestedHyperlinkedModelSerializer):
+    parent_lookup_kwargs = {
+        'zaken_pk': 'zaak__pk'
+    }
     class Meta:
         model = Status
         fields = (
             'url',
-            'parent',
             'statustoelichting',
             'datum_status_gezet',
             'indicatie_laatst_gezette_status',
@@ -302,25 +221,14 @@ class StatusSerializer(serializers.HyperlinkedModelSerializer):
             # 'StUF:aanvullendeElementen',
             'rol',
         )
+        extra_kwargs = {
+            'url': {'view_name': 'rest_api:zaken_statussen-detail'},
+            'status_type': {'view_name': 'rest_api:statustypen-detail'},
+            'rol': {'view_name': 'rest_api:rollen-detail'},
+        }
 
 
-class KlantcontactSerializer(HyperlinkedModelSerializer):
-    zaak = serializers.HyperlinkedRelatedField(
-        view_name='rest_api:zaken-detail',
-        queryset=Zaak.objects.all(),
-    )
-    medewerker = serializers.HyperlinkedRelatedField(
-        view_name='rest_api:medewerker-detail',
-        queryset=Medewerker.objects.all(),
-    )
-    natuurlijk_persoon = NestedHyperlinkedRelatedField(
-        view_name='rest_api:zaken_betrokkenen-detail',
-        lookup_kwargs={
-            "parent_lookup_zaken": "zaak_id",
-        },
-        queryset=NatuurlijkPersoon.objects.all(),
-    )
-
+class KlantcontactSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Klantcontact
         fields = (
@@ -336,7 +244,10 @@ class KlantcontactSerializer(HyperlinkedModelSerializer):
             'medewerker',
         )
         extra_kwargs = {
-            'url': {'view_name': 'rest_api:klantcontact-detail'},
+            'url': {'view_name': 'rest_api:klantcontacten-detail'},
+            'zaak': {'view_name': 'rest_api:zaken-detail'},
+            'natuurlijk_persoon': {'view_name': 'rest_api:natuurlijke-personen-detail'},
+            'medewerker': {'view_name': 'rest_api:medewerkers-detail'},
         }
 
 
@@ -368,7 +279,7 @@ class MedewerkerSerializer(serializers.HyperlinkedModelSerializer):
             # 'isVerantwoordelijkVoor',
         )
         extra_kwargs = {
-            'url': {'view_name': 'rest_api:medewerker-detail'},
+            'url': {'view_name': 'rest_api:medewerkers-detail'},
         }
 
 
@@ -413,5 +324,5 @@ class InformatieObjectSerializer(serializers.HyperlinkedModelSerializer):
             # 'omvat',
         )
         extra_kwargs = {
-            'url': {'view_name': 'rest_api:informatieobject-detail'},
+            'url': {'view_name': 'rest_api:informatieobjecten-detail'},
         }
