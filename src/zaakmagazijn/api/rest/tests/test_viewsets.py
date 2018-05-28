@@ -3,13 +3,13 @@ import json
 from django.test import TestCase
 from django.urls import reverse
 
+from ....rgbz.models import Klantcontact
 from ....rgbz.tests.factory_models import (
     InformatieObjectFactory, KlantcontactFactory, MedewerkerFactory,
     NatuurlijkPersoonFactory, RolFactory, StatusFactory, StatusTypeFactory,
     ZaakFactory, ZaakTypeFactory
 )
-from .base import APITestMixin, ReadOnlyViewSetMixin
-from ....rgbz.models import Klantcontact
+from .base import APITestCase, APITestMixin, ReadOnlyViewSetMixin
 
 
 class TestZaakViewSet(ReadOnlyViewSetMixin, APITestMixin, TestCase):

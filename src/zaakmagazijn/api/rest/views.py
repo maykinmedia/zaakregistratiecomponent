@@ -1,13 +1,16 @@
 from rest_framework import viewsets
 
-from .utils.viewsets import NestedViewSetMixin
 from ...rgbz.models import (
     InformatieObject, Klantcontact, Medewerker, NatuurlijkPersoon, Rol, Status,
-    StatusType, Zaak, ZaakType)
+    StatusType, Zaak, ZaakType
+)
 from .serializers import (
     InformatieObjectSerializer, KlantcontactSerializer, MedewerkerSerializer,
     NatuurlijkPersoonSerializer, RolSerializer, StatusSerializer,
-    StatusTypeSerializer, ZaakSerializer, ZaakTypeSerializer)
+    StatusTypeSerializer, ZaakSerializer, ZaakTypeSerializer
+)
+from .utils.viewsets import NestedViewSetMixin
+
 
 class ZaakViewSet(NestedViewSetMixin, viewsets.ReadOnlyModelViewSet):
     """

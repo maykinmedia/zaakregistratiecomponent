@@ -1,7 +1,6 @@
 from django.utils.translation import ugettext_lazy as _
 
-from rest_framework import authentication
-from rest_framework import exceptions
+from rest_framework import authentication, exceptions
 
 from .models import Organisation
 

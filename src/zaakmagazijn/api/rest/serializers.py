@@ -1,12 +1,12 @@
 from rest_framework import serializers
-from rest_framework.reverse import reverse
 from rest_framework_nested.relations import NestedHyperlinkedRelatedField
 from rest_framework_nested.serializers import NestedHyperlinkedModelSerializer
 
 from ...rgbz.models import (
     InformatieObject, Klantcontact, Medewerker, NatuurlijkPersoon, Rol, Status,
-    StatusType, Zaak, ZaakType,
-    Betrokkene)
+    StatusType, Zaak, ZaakType
+)
+
 
 class RolSerializer(serializers.HyperlinkedModelSerializer):
     betrokkene = serializers.HyperlinkedRelatedField(
@@ -35,7 +35,10 @@ class RolSerializer(serializers.HyperlinkedModelSerializer):
 class StatusTypeSerializer(serializers.HyperlinkedModelSerializer):
     zaaktypeidentificatie = serializers.IntegerField(source='zaaktype.zaaktypeidentificatie', read_only=True)
     zaaktypeomschrijving = serializers.CharField(source='zaaktype.zaaktypeomschrijving', read_only=True)
-    zaaktypeomschrijving_generiek = serializers.CharField(source='zaaktype.zaaktypeomschrijving_generiek', read_only=True)
+    zaaktypeomschrijving_generiek = serializers.CharField(
+        source='zaaktype.zaaktypeomschrijving_generiek',
+        read_only=True
+    )
     domein = serializers.CharField(source='zaaktype.domein', read_only=True)
     rsin = serializers.CharField(source='zaaktype.rsin', read_only=True)
 
@@ -202,6 +205,7 @@ class StatusSerializer(NestedHyperlinkedModelSerializer):
     parent_lookup_kwargs = {
         'zaken_pk': 'zaak__pk'
     }
+
     class Meta:
         model = Status
         fields = (

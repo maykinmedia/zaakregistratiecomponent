@@ -1,13 +1,13 @@
 from django.conf.urls import include, url
+
 from rest_framework_nested import routers
 
+from .schema import schema_view
 from .views import (
     InformatieObjectViewSet, KlantcontactViewSet, MedewerkerViewSet,
     NatuurlijkPersoonViewSet, RolViewSet, StatusTypeViewSet, StatusViewSet,
     ZaakTypeViewSet, ZaakViewSet
 )
-
-from .schema import schema_view
 
 root_router = routers.DefaultRouter()
 root_router.register(r'rollen', RolViewSet, base_name='rollen')

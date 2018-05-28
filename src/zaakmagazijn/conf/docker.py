@@ -30,4 +30,3 @@ ENVIRONMENT = 'production'
 
 
 ZAAKMAGAZIJN_URL = 'http://localhost:8000'
-
