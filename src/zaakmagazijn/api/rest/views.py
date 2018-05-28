@@ -1,13 +1,16 @@
 from rest_framework import viewsets
 
 from ...rgbz.models import (
-    InformatieObject, Klantcontact, Medewerker, NatuurlijkPersoon, Rol, Status,
-    StatusType, Zaak, ZaakType
+    InformatieObject, Klantcontact, Medewerker, NatuurlijkPersoon,
+    NietNatuurlijkPersoon, OrganisatorischeEenheid, Rol, Status, StatusType,
+    Vestiging, Zaak, ZaakType
 )
 from .serializers import (
-    InformatieObjectSerializer, KlantcontactSerializer, MedewerkerSerializer,
-    NatuurlijkPersoonSerializer, RolSerializer, StatusSerializer,
-    StatusTypeSerializer, ZaakSerializer, ZaakTypeSerializer
+    BetrokkeneSerializer, InformatieObjectSerializer, KlantcontactSerializer,
+    MedewerkerSerializer, NatuurlijkPersoonSerializer,
+    NietNatuurlijkPersoonSerializer, OrganisatorischeEenheidSerializer,
+    RolSerializer, StatusSerializer, StatusTypeSerializer, VestigingSerializer,
+    ZaakSerializer, ZaakTypeSerializer
 )
 from .utils.viewsets import NestedViewSetMixin
 
@@ -82,3 +85,26 @@ class InformatieObjectViewSet(viewsets.ReadOnlyModelViewSet):
     """
     queryset = InformatieObject.objects.all()
     serializer_class = InformatieObjectSerializer
+
+
+class NietNatuurlijkPersoonViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = NietNatuurlijkPersoon.objects.all()
+    serializer_class = NietNatuurlijkPersoonSerializer
+
+
+class VestigingViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Vestiging.objects.all()
+    serializer_class = VestigingSerializer
+
+
+class OrganisatorischeEenheidViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = OrganisatorischeEenheid.objects.all()
+    serializer_class = OrganisatorischeEenheidSerializer
+
+
+class BetrokkeneViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Get the betrokkene information for a role.
+    """
+    queryset = Rol.objects.all()
+    serializer_class = BetrokkeneSerializer

@@ -9,7 +9,7 @@ from ....rgbz.tests.factory_models import (
     NatuurlijkPersoonFactory, RolFactory, StatusFactory, StatusTypeFactory,
     ZaakFactory, ZaakTypeFactory
 )
-from .base import APITestCase, APITestMixin, ReadOnlyViewSetMixin
+from .base import APITestMixin, ReadOnlyViewSetMixin
 
 
 class TestZaakViewSet(ReadOnlyViewSetMixin, APITestMixin, TestCase):

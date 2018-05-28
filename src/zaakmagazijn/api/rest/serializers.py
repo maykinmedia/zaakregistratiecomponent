@@ -3,8 +3,9 @@ from rest_framework_nested.relations import NestedHyperlinkedRelatedField
 from rest_framework_nested.serializers import NestedHyperlinkedModelSerializer
 
 from ...rgbz.models import (
-    InformatieObject, Klantcontact, Medewerker, NatuurlijkPersoon, Rol, Status,
-    StatusType, Zaak, ZaakType
+    InformatieObject, Klantcontact, Medewerker, NatuurlijkPersoon,
+    NietNatuurlijkPersoon, OrganisatorischeEenheid, Rol, Status, StatusType,
+    Vestiging, Zaak, ZaakType
 )
 
 
@@ -68,7 +69,7 @@ class ZaakSerializer(serializers.HyperlinkedModelSerializer):
         many=True,
         read_only=True,
         source='rol_set',
-        view_name='rest_api:natuurlijke-personen-detail',
+        view_name='rest_api:betrokkenen-detail',
     )
 
     heeft = NestedHyperlinkedRelatedField(
@@ -330,3 +331,52 @@ class InformatieObjectSerializer(serializers.HyperlinkedModelSerializer):
         extra_kwargs = {
             'url': {'view_name': 'rest_api:informatieobjecten-detail'},
         }
+
+
+class NietNatuurlijkPersoonSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = NietNatuurlijkPersoon
+        fields = ('id',)  # TODO
+
+
+class VestigingSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Vestiging
+        fields = ('id',)  # TODO
+
+
+class OrganisatorischeEenheidSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = OrganisatorischeEenheid
+        fields = ('id',)  # TODO
+
+
+class BetrokkeneSerializer(serializers.HyperlinkedModelSerializer):
+    medewerker = serializers.HyperlinkedRelatedField(
+        source='betrokkene.medewerker', read_only=True,
+        view_name='rest_api:medewerkers-detail'
+    )
+    natuurlijk_persoon = serializers.HyperlinkedRelatedField(
+        source='betrokkene.natuurlijkpersoon', read_only=True,
+        view_name='rest_api:natuurlijke-personen-detail'
+    )
+    niet_natuurlijk_persoon = serializers.HyperlinkedRelatedField(
+        source='betrokkene.nietnatuurlijkpersoon', read_only=True,
+        view_name='rest_api:niet-natuurlijkepersonen-detail'
+    )
+    vestiging = serializers.HyperlinkedRelatedField(
+        source='betrokkene.vestiging', read_only=True,
+        view_name='rest_api:vestigingen-detail'
+    )
+    organisatorische_eenheid = serializers.HyperlinkedRelatedField(
+        source='betrokkene.organisatorischeeenheid', read_only=True,
+        view_name='rest_api:organisatorische-eenheden-detail'
+    )
+
+    class Meta:
+        model = Rol
+        fields = (
+            'id', 'medewerker', 'natuurlijk_persoon',
+            'niet_natuurlijk_persoon', 'vestiging',
+            'organisatorische_eenheid'
+        )

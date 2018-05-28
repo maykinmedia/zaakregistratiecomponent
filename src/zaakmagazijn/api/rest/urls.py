@@ -4,12 +4,14 @@ from rest_framework_nested import routers
 
 from .schema import schema_view
 from .views import (
-    InformatieObjectViewSet, KlantcontactViewSet, MedewerkerViewSet,
-    NatuurlijkPersoonViewSet, RolViewSet, StatusTypeViewSet, StatusViewSet,
-    ZaakTypeViewSet, ZaakViewSet
+    BetrokkeneViewSet, InformatieObjectViewSet, KlantcontactViewSet,
+    MedewerkerViewSet, NatuurlijkPersoonViewSet, NietNatuurlijkPersoonViewSet,
+    OrganisatorischeEenheidViewSet, RolViewSet, StatusTypeViewSet,
+    StatusViewSet, VestigingViewSet, ZaakTypeViewSet, ZaakViewSet
 )
 
 root_router = routers.DefaultRouter()
+root_router.register(r'betrokkenen', BetrokkeneViewSet, base_name='betrokkenen'),
 root_router.register(r'rollen', RolViewSet, base_name='rollen')
 root_router.register(r'statustypen', StatusTypeViewSet, base_name='statustypen')
 root_router.register(r'klantcontacten', KlantcontactViewSet, base_name='klantcontacten')
@@ -17,17 +19,26 @@ root_router.register(r'medewerkers', MedewerkerViewSet, base_name='medewerkers')
 root_router.register(r'informatieobjecten', InformatieObjectViewSet, base_name='informatieobjecten')
 root_router.register(r'zaaktypen', ZaakTypeViewSet, base_name='zaaktypen')  # parents_query_lookups=['zaak']
 root_router.register(r'zaken', ZaakViewSet, base_name='zaken')
-root_router.register(r'natuurlijke-personen', NatuurlijkPersoonViewSet, base_name='natuurlijke-personen')  # parents_query_lookups=['zaken']
+# parents_query_lookups=['zaken']
+root_router.register(r'natuurlijke-personen', NatuurlijkPersoonViewSet, base_name='natuurlijke-personen')
+
+root_router.register(r'niet-natuurlijke-personen', NietNatuurlijkPersoonViewSet, base_name='niet-natuurlijke-personen')
+root_router.register(r'vestigingen', VestigingViewSet, base_name='vestigingen')
+root_router.register(r'organisatorische-eenheden', OrganisatorischeEenheidViewSet,
+                     base_name='organisatorische-eenheden')
 
 zaken_router = routers.NestedSimpleRouter(root_router, r'zaken', lookup='zaken')
-zaken_router.register(r'statussen', StatusViewSet, base_name='zaken_statussen') #  parents_query_lookups=['zaak']
+# parents_query_lookups=['zaak']
+zaken_router.register(r'statussen', StatusViewSet, base_name='zaken_statussen')
 
 
 API_PREFIX = r'^v(?P<version>\d+)'
 
 
 urlpatterns = [
-    url(r'{}/schema(?P<format>.json|.yaml)$'.format(API_PREFIX), schema_view.without_ui(cache_timeout=None), name='api-schema-json'),
+    url(r'{}/schema(?P<format>.json|.yaml)$'.format(API_PREFIX),
+        schema_view.without_ui(cache_timeout=None),
+        name='api-schema-json'),
     url(r'{}/schema/$'.format(API_PREFIX), schema_view.with_ui('redoc', cache_timeout=None), name='api-schema'),
 
     url('{}/'.format(API_PREFIX), include(root_router.urls)),
