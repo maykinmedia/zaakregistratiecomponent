@@ -95,8 +95,20 @@ DEBUG_TOOLBAR_CONFIG = {
 
 ZAAKMAGAZIJN_URL = 'http://localhost:8000'
 
+#
+# DRF
+#
+REST_FRAMEWORK['DEFAULT_RENDERER_CLASSES'] += (
+    'rest_framework.renderers.BrowsableAPIRenderer',
+)
+
+REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'] += (
+    'rest_framework.authentication.SessionAuthentication',
+)
+
+
 # Override settings with local settings.
 try:
-    from .local import *
+    from .local import *  # noqa
 except ImportError:
     pass
