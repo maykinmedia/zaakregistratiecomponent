@@ -1,5 +1,6 @@
 import json
 
+from django.test import TestCase
 from django.urls import reverse
 
 from ....rgbz.tests.factory_models import (
@@ -7,11 +8,11 @@ from ....rgbz.tests.factory_models import (
     NatuurlijkPersoonFactory, RolFactory, StatusFactory, StatusTypeFactory,
     ZaakFactory, ZaakTypeFactory
 )
-from .base import APITestCase, ReadOnlyViewSetMixin
+from .base import APITestMixin, ReadOnlyViewSetMixin
 from ....rgbz.models import Klantcontact
 
 
-class TestZaakViewSet(ReadOnlyViewSetMixin, APITestCase):
+class TestZaakViewSet(ReadOnlyViewSetMixin, APITestMixin, TestCase):
     def setUp(self):
         super().setUp()
 
@@ -39,7 +40,7 @@ class TestZaakViewSet(ReadOnlyViewSetMixin, APITestCase):
         self.assertEqual(response.data['url'], 'http://testserver{}'.format(self.detail_url))
 
 
-class TestRolViewSet(ReadOnlyViewSetMixin, APITestCase):
+class TestRolViewSet(ReadOnlyViewSetMixin, APITestMixin, TestCase):
     def setUp(self):
         super().setUp()
 
@@ -67,7 +68,7 @@ class TestRolViewSet(ReadOnlyViewSetMixin, APITestCase):
         self.assertEqual(response.data['url'], 'http://testserver{}'.format(self.detail_url))
 
 
-class TestStatusTypeViewSet(ReadOnlyViewSetMixin, APITestCase):
+class TestStatusTypeViewSet(ReadOnlyViewSetMixin, APITestMixin, TestCase):
     def setUp(self):
         super().setUp()
 
@@ -95,7 +96,7 @@ class TestStatusTypeViewSet(ReadOnlyViewSetMixin, APITestCase):
         self.assertEqual(response.data['url'], 'http://testserver{}'.format(self.detail_url))
 
 
-class TestKlantcontactViewSet(APITestCase):
+class TestKlantcontactViewSet(APITestMixin, TestCase):
     def setUp(self):
         super().setUp()
 
@@ -282,7 +283,7 @@ class TestKlantcontactViewSet(APITestCase):
         })
 
 
-class TestNatuurlijkPersoonViewSet(ReadOnlyViewSetMixin, APITestCase):
+class TestNatuurlijkPersoonViewSet(ReadOnlyViewSetMixin, APITestMixin, TestCase):
     def setUp(self):
         super().setUp()
 
@@ -310,7 +311,7 @@ class TestNatuurlijkPersoonViewSet(ReadOnlyViewSetMixin, APITestCase):
         self.assertEqual(response.data['url'], 'http://testserver{}'.format(self.detail_url))
 
 
-class TestZaakTypeViewSet(ReadOnlyViewSetMixin, APITestCase):
+class TestZaakTypeViewSet(ReadOnlyViewSetMixin, APITestMixin, TestCase):
     def setUp(self):
         super().setUp()
 
@@ -338,7 +339,7 @@ class TestZaakTypeViewSet(ReadOnlyViewSetMixin, APITestCase):
         self.assertEqual(response.data['url'], 'http://testserver{}'.format(self.detail_url))
 
 
-class TestStatusViewSet(ReadOnlyViewSetMixin, APITestCase):
+class TestStatusViewSet(ReadOnlyViewSetMixin, APITestMixin, TestCase):
     def setUp(self):
         super().setUp()
 
@@ -373,7 +374,7 @@ class TestStatusViewSet(ReadOnlyViewSetMixin, APITestCase):
         self.assertEqual(response.data['url'], 'http://testserver{}'.format(self.detail_url))
 
 
-class TestMedewerkerViewSet(ReadOnlyViewSetMixin, APITestCase):
+class TestMedewerkerViewSet(ReadOnlyViewSetMixin, APITestMixin, TestCase):
     def setUp(self):
         super().setUp()
 
@@ -401,7 +402,7 @@ class TestMedewerkerViewSet(ReadOnlyViewSetMixin, APITestCase):
         self.assertEqual(response.data['url'], 'http://testserver{}'.format(self.detail_url))
 
 
-class TestInformatieObjectViewSet(ReadOnlyViewSetMixin, APITestCase):
+class TestInformatieObjectViewSet(ReadOnlyViewSetMixin, APITestMixin, TestCase):
     def setUp(self):
         super().setUp()
 

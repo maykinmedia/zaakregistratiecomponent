@@ -81,7 +81,7 @@ class APIVersionTestMixin(object):
     API_VERSION = '1'
 
 
-class APITestCase(APIVersionTestMixin, AuthenticationTestMixin, TestCase):
+class APITestMixin(APIVersionTestMixin, AuthenticationTestMixin):
     def setUp(self):
         super().setUp()
 
