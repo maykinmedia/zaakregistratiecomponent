@@ -15,7 +15,7 @@ DATABASES = {
         'USER': 'jenkins',
         'PASSWORD': 'jenkins',
         'HOST': '',  # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
-        'PORT': '5435',  # PostgreSQL 9.5 on Jenkins.
+        'PORT': '',  # PostgreSQL 9.6 on Jenkins.
         'TEST': {
             'NAME': 'test_%s' % os.getenv('JOB_NAME', default='zaakmagazijn')
         }
